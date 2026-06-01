@@ -1,9 +1,3 @@
-"""
-app/services/auth_service.py
-----------------------------
-Business logic for authentication and authorization.
-"""
-
 from datetime import timedelta
 from typing import Optional
 
@@ -43,6 +37,7 @@ class AuthService:
             email=payload.email,
             _password_hash=hashed_pw,
             role="user",
+            is_active=True,
         )
         self.user_repo.session.add(user)
         self.user_repo.session.commit()
@@ -56,8 +51,12 @@ class AuthService:
         user = self.user_repo.get_by_email(payload.email)
         if not user or not verify_password(payload.password, user.hashed_password):
             raise AuthenticationError("Invalid credentials")
-        access = create_access_token(subject=str(user.id), expires_delta=timedelta(minutes=15))
-        refresh = create_refresh_token(subject=str(user.id), expires_delta=timedelta(days=7))
+        if not user.is_active:
+            raise AuthenticationError("User account is disabled")
+        access = create_access_token(
+            subject=str(user.id), role=user.role
+        )
+        refresh = create_refresh_token(subject=str(user.id))
         return TokenOut(access_token=access, refresh_token=refresh)
 
     # ---------------------------------------------------------------------
@@ -71,8 +70,8 @@ class AuthService:
         user = self.user_repo.get_by_id(user_id)
         if not user:
             raise AuthenticationError("User not found for token")
-        access = create_access_token(subject=str(user.id), expires_delta=timedelta(minutes=15))
-        new_refresh = create_refresh_token(subject=str(user.id), expires_delta=timedelta(days=7))
+        access = create_access_token(subject=str(user.id), role=user.role)
+        new_refresh = create_refresh_token(subject=str(user.id))
         return TokenOut(access_token=access, refresh_token=new_refresh)
 
     # ---------------------------------------------------------------------

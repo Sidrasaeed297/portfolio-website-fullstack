@@ -13,7 +13,7 @@ _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Return ``True`` if *plain_password* matches *hashed_password*.
+    """Return ``True`` if *plain_password* matches *hashed_password``.
     ``passlib`` handles the constant‑time comparison.
     """
     return _pwd_context.verify(plain_password, hashed_password)
@@ -27,10 +27,15 @@ def get_password_hash(password: str) -> str:
 # JWT helpers – access & refresh tokens share the same secret/algorithm.
 # ---------------------------------------------------------------------------
 
-def _encode_token(subject: Any, token_type: str, expires: timedelta) -> str:
+def _encode_token(
+    subject: Any,
+    token_type: str,
+    expires: timedelta,
+    extra_claims: Optional[Dict[str, Any]] = None,
+) -> str:
     """Core encoder used by both access and refresh helpers.
-    The payload includes ``sub`` (subject identifier), ``exp`` (expiry) and ``typ``
-    (token type) to aid in validation.
+    The payload includes ``sub`` (subject identifier), ``exp`` (expiry), ``typ``
+    (token type) and any additional claims such as ``role``.
     """
     expire = datetime.now(timezone.utc) + expires
     payload: Dict[str, Any] = {
@@ -38,18 +43,32 @@ def _encode_token(subject: Any, token_type: str, expires: timedelta) -> str:
         "exp": expire,
         "typ": token_type,
     }
+    if extra_claims:
+        payload.update(extra_claims)
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
-def create_access_token(subject: Any, expires_delta: Optional[timedelta] = None) -> str:
-    """Generate a short‑lived access token (default 15 minutes)."""
-    delta = expires_delta or timedelta(minutes=15)
-    return _encode_token(subject, "access", delta)
+def create_access_token(
+    subject: Any,
+    expires_delta: Optional[timedelta] = None,
+    role: Optional[str] = None,
+) -> str:
+    """Generate a short‑lived access token (default from settings).
+    Include optional ``role`` claim for authorization checks.
+    """
+    delta = expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    extra = {"role": role} if role else None
+    return _encode_token(subject, "access", delta, extra_claims=extra)
 
 
-def create_refresh_token(subject: Any, expires_delta: Optional[timedelta] = None) -> str:
-    """Generate a long‑lived refresh token (default 7 days)."""
-    delta = expires_delta or timedelta(days=7)
+def create_refresh_token(
+    subject: Any,
+    expires_delta: Optional[timedelta] = None,
+) -> str:
+    """Generate a long‑lived refresh token (default from settings)."""
+    # Use configured days if available, otherwise fallback to 7 days
+    default_days = getattr(settings, "REFRESH_TOKEN_EXPIRE_DAYS", 7)
+    delta = expires_delta or timedelta(days=default_days)
     return _encode_token(subject, "refresh", delta)
 
 
