@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy.orm import Session
 
-from app.core.security import decode_jwt
+from app.core.security import decode_token
 from app.models.user import User
 from app.database.session import get_db
 from app.repositories.user_repository import UserRepository
@@ -17,7 +17,7 @@ def _get_user_from_token(token: str, db: Session) -> User:
     Raises appropriate ``HTTPException`` for any failure case.
     """
     try:
-        payload = decode_jwt(token)
+        payload = decode_token(token)
         if payload is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
         # Reject refresh tokens used where an access token is required

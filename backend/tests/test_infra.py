@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Mapped, mapped_column, Session
-from app.models.base import Base
+from app.models.base import BaseEntity
 from app.repositories.base import GenericRepository
 from fastapi.testclient import TestClient
 
 # Define a test-scoped concrete model to validate GenericRepository structures
-class DummyItem(Base):
+class DummyItem(BaseEntity):
+    __tablename__ = "dummy_items"
     name: Mapped[str] = mapped_column(nullable=False)
 
 class DummyItemRepository(GenericRepository[DummyItem]):

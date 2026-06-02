@@ -41,7 +41,7 @@ export default function Header() {
             {user?.username || user?.name || "Admin"}
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-400">
-            {user?.email || "admin@example.com"}
+            {user?.email || "admin@meenu-dev.com"}
           </p>
         </div>
         <button

@@ -1,6 +1,6 @@
-# Software Architecture Specification: Full Stack Portfolio Website
+# Software Architecture Specification: Meenu-Dev Company Website
 
-This document provides a production-ready, industry-standard software architecture specification for a modular, clean, and highly scalable Full Stack Portfolio Website.
+This document provides a production-ready, industry-standard software architecture specification for a modular, clean, and highly scalable company website for Meenu-Dev.
 
 ---
 

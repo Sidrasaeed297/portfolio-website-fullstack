@@ -57,18 +57,3 @@ class User(BaseEntity):
 
     def display_label(self) -> str:
         return f"User: {self.username}"
-
-
-class Admin(User):
-    """Administrative user – demonstrates inheritance & polymorphism.
-
-    SQLAlchemy's *single‑table inheritance* (STI) is used via the ``type``
-    discriminator column. No extra data fields are required; the class exists
-    primarily so that ``isinstance(user, Admin)`` works.
-    """
-
-    __mapper_args__ = {"polymorphic_identity": "admin"}
-    type: Mapped[str] = mapped_column(String(20), default="admin")
-
-    def display_label(self) -> str:
-        return f"Admin: {self.username}"

@@ -22,7 +22,7 @@ Validates that the API, database connectivity, and middleware lifecycle are full
   ```json
   {
     "status": "healthy",
-    "project": "Portfolio API",
+    "project": "Meenu-Dev API",
     "version": "1.0.0"
   }
   ```

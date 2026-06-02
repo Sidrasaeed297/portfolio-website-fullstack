@@ -32,16 +32,7 @@ class AuthService:
         if existing:
             raise AuthenticationError("Email already registered")
         hashed_pw = get_password_hash(payload.password)
-        user = User(
-            username=payload.username,
-            email=payload.email,
-            _password_hash=hashed_pw,
-            role="user",
-            is_active=True,
-        )
-        self.user_repo.session.add(user)
-        self.user_repo.session.commit()
-        self.user_repo.session.refresh(user)
+        user = self.user_repo.create_user(payload, hashed_pw)
         return UserOut.from_orm(user)
 
     # ---------------------------------------------------------------------

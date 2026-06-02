@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class RegisterIn(BaseModel):
@@ -29,6 +29,10 @@ class TokenPayload(BaseModel):
     role: Literal["user", "admin"] = "user"
 
 
+class RefreshTokenIn(BaseModel):
+    refresh_token: str
+
+
 class TokenOut(BaseModel):
     access_token: str
     refresh_token: str
@@ -42,5 +46,4 @@ class UserOut(BaseModel):
     is_active: bool
     role: Literal["user", "admin"]
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

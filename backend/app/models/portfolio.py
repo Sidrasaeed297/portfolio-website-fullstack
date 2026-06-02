@@ -14,7 +14,7 @@ Each model demonstrates:
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Optional
 
 from sqlalchemy import String, Text, Date, Boolean
@@ -52,8 +52,8 @@ class Experience(BaseEntity):
     company: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
     role: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
-    start_date: Mapped[Date] = mapped_column(nullable=False)
-    end_date: Mapped[Optional[Date]] = mapped_column()
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[Optional[date]] = mapped_column(Date)
     is_current: Mapped[bool] = mapped_column(Boolean, default=False)
 
     def display_label(self) -> str:
@@ -71,8 +71,8 @@ class Education(BaseEntity):
     institution: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
     degree: Mapped[str] = mapped_column(String(120), nullable=False)
     field_of_study: Mapped[Optional[str]] = mapped_column(String(120))
-    start_date: Mapped[Date] = mapped_column(nullable=False)
-    end_date: Mapped[Optional[Date]] = mapped_column()
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[Optional[date]] = mapped_column(Date)
     is_current: Mapped[bool] = mapped_column(Boolean, default=False)
 
     def display_label(self) -> str:

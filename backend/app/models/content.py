@@ -22,8 +22,8 @@ import abc
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import String, Text, ForeignKey, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Text, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import BaseEntity
 
@@ -38,8 +38,6 @@ class Content(BaseEntity):
     """
 
     __abstract__ = True
-    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    author: Mapped["User"] = relationship("User", backref="contents")
 
     @abc.abstractmethod
     def render_summary(self) -> str:
@@ -66,11 +64,6 @@ class Project(Content):
     tech_stack: Mapped[Optional[str]] = mapped_column(String(250))
     demo_url: Mapped[Optional[str]] = mapped_column(String(250))
     repo_url: Mapped[Optional[str]] = mapped_column(String(250))
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
 
     def render_summary(self) -> str:
         return f"{self.title} – {self.tech_stack or 'Various'}"
