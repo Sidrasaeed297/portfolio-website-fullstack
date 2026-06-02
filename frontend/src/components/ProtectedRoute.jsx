@@ -1,16 +1,28 @@
+// src/components/ProtectedRoute.jsx
 import { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext.jsx";
 
+/**
+ * Guard component for admin‑only routes.
+ *   * If not authenticated → redirect to /admin/login.
+ *   * If authenticated but role !== "admin" → redirect to /not-authorized.
+ *   * Otherwise render the protected children.
+ */
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, user } = useContext(AuthContext);
   const location = useLocation();
 
   if (!isAuthenticated) {
-    // Redirect unauthenticated users to the admin login page
+    // Unauthenticated users go to the admin login page.
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  // Authenticated – render the protected component tree
+  if (user?.role !== "admin") {
+    // Authenticated but not an admin → show access‑denied page.
+    return <Navigate to="/not-authorized" replace />;
+  }
+
+  // Authenticated admin – render the protected component tree.
   return children;
 }
